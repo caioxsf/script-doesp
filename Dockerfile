@@ -32,8 +32,6 @@ RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# RUN mkdir -p /app/data /app/image-graphic
-
 ENV PYTHONUNBUFFERED=1
 
 CMD ["python", "main.py"]

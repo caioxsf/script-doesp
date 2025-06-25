@@ -33,27 +33,27 @@ def scraping_doesp():
     ).click()
     time.sleep(1)
 
-    aux = False
-    i = 0
-    while True:
-        try:
-            if aux == False:
-                try:
-                    element_list = WebDriverWait(browser.driver, 2).until(
-                        EC.presence_of_element_located(
-                            (By.ID, f"mui-tree-view-{i}-777a380f-509a-48b6-4ebd-08db6b9689d9")
-                        )
-                    )
-                except:
-                    pass
-            if element_list:
-                aux = True
-                break
-            i += 1
-        except Exception as e:
-            print("Error for get element of Diretoria de Ensino de Assis: ", e)
+    # aux = False
+    # i = 0
+    # while True:
+    #     try:
+    #         if aux == False:
+    #             try:
+    #                 element_list = WebDriverWait(browser.driver, 2).until(
+    #                     EC.presence_of_element_located(
+    #                         (By.ID, f"mui-tree-view-{i}-777a380f-509a-48b6-4ebd-08db6b9689d9")
+    #                     )
+    #                 )
+    #             except:
+    #                 pass
+    #         if element_list:
+    #             aux = True
+    #             break
+    #         i += 1
+    #     except Exception as e:
+    #         print("Error for get element of Diretoria de Ensino de Assis: ", e)
         
-    time.sleep(1)
-    links = element_list.find_elements(By.XPATH, ".//a")
-    for link in links:
-        link.click()
+    # time.sleep(1)
+    # links = element_list.find_elements(By.XPATH, ".//a")
+    # for link in links:
+    #     link.click()
