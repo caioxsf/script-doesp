@@ -1,5 +1,7 @@
-from src.browser import Browser
-import time
+from src.doesp import scraping_doesp
 
-browser = Browser()
-browser.open("https://google.com")
+def main():
+    scraping_doesp()
+
+if __name__ == "__main__":
+    main()
