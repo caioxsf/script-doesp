@@ -30,8 +30,6 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearm
 
 RUN apt-get update && apt-get install -y build-essential libfreetype6-dev liblcms2-dev libjpeg-dev zlib1g-dev
 
-
-
 RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir  -r requirements.txt

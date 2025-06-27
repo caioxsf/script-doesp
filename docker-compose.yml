@@ -8,5 +8,5 @@ services:
       - ./output:/app/output
     environment:
       - PYTHONUNBUFFERED=1
-      - DISPLAY=192.168.3.7:0.0
+      #- DISPLAY=:0
     command: python main.py
