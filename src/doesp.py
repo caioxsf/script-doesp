@@ -6,6 +6,10 @@ import time
 import os
 from zoneinfo import ZoneInfo
 from datetime import datetime
+import smtplib
+from email.message import EmailMessage
+import os
+from dotenv import load_dotenv
 
 from src.browser import Browser
 from selenium import webdriver
@@ -26,10 +30,9 @@ section = {
 
 def remove_files(dir_folder):
     """
-    Remove files in folder
-    
-    **dir_folder**\n
-    example: /app/output
+    **Remove files in folder**
+
+    - dir_folder: example: /app/output
     """
     for nome_arquivo in os.listdir(dir_folder):
         full_dir = os.path.join(dir_folder, nome_arquivo)
@@ -53,15 +56,43 @@ def generate_pdf_reportlab(list_content, name_file):
 
     doc.build(story)
 
+load_dotenv()
+def send_email(recipient, subject, body, dir_pdf):
+    """
+    **Send PDF to e-mail of recipient**
+    
+    - recipient: e-mail of recipient
+    - subject: subject of message
+    - body: body of message
+    - dir_pdf: dir of pdf
+    """
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = os.getenv("EMAIL")
+    msg["To"] = recipient
+    msg.set_content(body)
+
+    if dir_pdf != "":
+        with open(dir_pdf, "rb") as f:
+            pdf_data = f.read()
+            msg.add_attachment(pdf_data, maintype="application", subtype="pdf", filename=os.path.basename(dir_pdf))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(os.getenv("EMAIL"), os.getenv("PASSWORD"))
+        smtp.send_message(msg)
+
+    print("E-mail enviado com sucesso.")
+    
+    
 def scraping_doesp():
     """
-    scraping of website doe.sp for save important contents diary
+    **Scraping of website doe.sp for save important contents diary**
     """
     browser = Browser()
 
     list_content = []
     date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
-    browser.open(f"https://doe.sp.gov.br/sumario?editionDate=2025-06-10")
+    browser.open(f"https://doe.sp.gov.br/sumario?editionDate={date_today}")
 
     time.sleep(3)
     WebDriverWait(browser.driver, 10).until(
@@ -140,5 +171,17 @@ def scraping_doesp():
         name_file = os.path.join(output_dir, f"leitura-diario-{date_today}.pdf")
         remove_files(output_dir)
         generate_pdf_reportlab(list_content, name_file)
+        pdf_path = f"/app/output/leitura-diario-{date_today}.pdf"
+        send_email(
+            os.getenv("DESTINATARIO"), 
+            "PDF do Diário Oficial", 
+            body="Segue em anexo o PDF gerado.", 
+            dir_pdf=pdf_path)
     else:
+        send_email(
+            os.getenv("DESTINATARIO"), 
+            "PDF do Diário Oficial", 
+            body=f"Não existem matérias da Diretoria de Ensino - Região de Assis para o dia {date_today.strftime('%d/%m/%Y')}",
+            dir_pdf=""
+        )
         print(f"Não existem matérias da Diretoria de Ensino - Região de Assis para o dia {date_today.strftime('%d/%m/%Y')}")
