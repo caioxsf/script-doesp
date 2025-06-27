@@ -1,5 +1,11 @@
+"""
+Scraping in website doe-sp and save file to pdf and to send file to e-mail
+"""
+
 import time
-from datetime import date
+import os
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 from src.browser import Browser
 from selenium import webdriver
@@ -7,17 +13,55 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-section = [
-    "Atos Normativos",
-    "Atos de Pessoal",
-    "Atos de Gestão e Despesas"
-]
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+section = {
+    "Atos Normativos": ["Secretaria da Educação"],
+    "Atos de Pessoal": ["Secretaria da Educação", "Educação I"],
+    "Atos de Gestão e Despesas": ["Secretaria da Educação"]
+}
+
+def remove_files(dir_folder):
+    """
+    Remove files in folder
+    
+    **dir_folder**\n
+    example: /app/output
+    """
+    for nome_arquivo in os.listdir(dir_folder):
+        full_dir = os.path.join(dir_folder, nome_arquivo)
+        if os.path.isfile(full_dir):
+            os.remove(full_dir)
+
+def generate_pdf_reportlab(list_content, name_file):
+    """
+    **list_content:** list of tuplas (header, content)\n
+    **name_file:** name of the file to save
+    """
+    doc = SimpleDocTemplate(name_file, pagesize=A4)
+    styles = getSampleStyleSheet()
+    story = []
+
+    for header, content in list_content:
+        story.append(Paragraph(f"<b>{header}</b>", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(content, styles['Normal']))
+        story.append(Spacer(1, 24))
+
+    doc.build(story)
 
 def scraping_doesp():
+    """
+    scraping of website doe.sp for save important contents diary
+    """
     browser = Browser()
 
-    date_today = date.today() 
-    browser.open(f"https://doe.sp.gov.br/sumario?editionDate={date_today}")
+    list_content = []
+    date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
+    browser.open(f"https://doe.sp.gov.br/sumario?editionDate=2025-06-10")
 
     time.sleep(3)
     WebDriverWait(browser.driver, 10).until(
@@ -25,73 +69,76 @@ def scraping_doesp():
     ).click()
     time.sleep(1)
 
-    var_aux = False
-    for i in range(len(section)):
-        WebDriverWait(browser.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, f"//button[contains(., '{section[i]}')]"))
-        ).click()
-        time.sleep(1)
-
+    for sec in section:
         try:
-            WebDriverWait(browser.driver, 3).until(
-                EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/div[2]/div/div[4]/div/div[2]/div/div[1]/div/div/div"))
+            WebDriverWait(browser.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, f"//button[contains(., '{sec}')]"))
             ).click()
             time.sleep(1)
 
-            WebDriverWait(browser.driver, 3).until(
-                EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Secretaria da Educação')]"))
-            ).click()
-            time.sleep(1)
-        except Exception as e:
-            pass
-        
-        try:
-            element_list = WebDriverWait(browser.driver, 2).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, '//div[contains(@class, "MuiTreeItem-label") and contains(text(), "Diretoria de Ensino - Região de Assis")]/../..')
-                )
-            )
-            if element_list:
-                var_aux = True
-                break
-        except Exception as e:
-            var_aux = False
-            
-    if var_aux == False:
-        date_now = str(date_today).split("-")
-        day = date_now[-1]
-        year = date_now[0]
-        month = date_now[1]
-        str_date = day+"/"+month+"/"+year
-        print(f"Não existem matérias para o dia {str_date}")
-   
-    if var_aux == True:         
-        try:
-            links = element_list.find_elements(By.TAG_NAME, "a")
-            for link in links:
-                link.click()
-        except Exception as e:
-            print("If element of Diretoria de Ensino de Assis not found, impossible for get links.")
-            pass
-        
-        abas = browser.driver.window_handles
-        for handle in abas[1:]:
-            browser.driver.switch_to.window(handle)
-            time.sleep(2)
-            header = WebDriverWait(browser.driver, 2).until(
-                EC.presence_of_element_located(
-                    (By.CLASS_NAME, 'css-1n1clc2')
-                )
-            ).text
-            time.sleep(1)
-            
-            content = WebDriverWait(browser.driver, 2).until(
-                EC.presence_of_element_located(
-                    (By.CLASS_NAME, 'css-1e09a5c')
-                )
-            ).text
-            time.sleep(1)
+            for secretaria in section.get(sec, []):
+                try:
+                    WebDriverWait(browser.driver, 3).until(
+                        EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/div[2]/div/div[4]/div/div[2]/div/div[1]/div/div/div"))
+                    ).click()
+                    time.sleep(1)
+                except:
+                    continue
 
-            print(header)
-            print(content)
-            print("--------------------------------\n")
+                try:
+                    WebDriverWait(browser.driver, 3).until(
+                        EC.element_to_be_clickable((By.XPATH, f"//li[contains(., '{secretaria}')]"))
+                    ).click()
+                    print(f"Tentando clicar em: {secretaria}")
+                    time.sleep(1)
+                except:
+                    print(f"Não foi possível clicar em: {secretaria}")
+                    continue
+
+                try:
+                    element_list = WebDriverWait(browser.driver, 2).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//div[contains(@class, "MuiTreeItem-label") and contains(text(), "Diretoria de Ensino - Região de Assis")]/../..')
+                        )
+                    )
+
+                    links = element_list.find_elements(By.TAG_NAME, "a")
+                    for link in links:
+                        link.click()
+                    time.sleep(1)
+
+                    abas = browser.driver.window_handles
+                    for handle in abas[1:]:
+                        browser.driver.switch_to.window(handle)
+                        time.sleep(2)
+
+                        header = WebDriverWait(browser.driver, 2).until(
+                            EC.presence_of_element_located(
+                                (By.CLASS_NAME, 'css-1n1clc2')
+                            )
+                        ).text
+
+                        content = WebDriverWait(browser.driver, 2).until(
+                            EC.presence_of_element_located(
+                                (By.CLASS_NAME, 'css-1e09a5c')
+                            )
+                        ).text
+
+                        list_content.append((f"{sec} - {secretaria} - {header}", content))
+
+                    for handle in abas[1:]:
+                        browser.driver.switch_to.window(handle)
+                        browser.driver.close()
+                    browser.driver.switch_to.window(abas[0])
+                except:
+                    continue
+        except:
+            continue
+            
+    if list_content:
+        output_dir = "/app/output/"
+        name_file = os.path.join(output_dir, f"leitura-diario-{date_today}.pdf")
+        remove_files(output_dir)
+        generate_pdf_reportlab(list_content, name_file)
+    else:
+        print(f"Não existem matérias da Diretoria de Ensino - Região de Assis para o dia {date_today.strftime('%d/%m/%Y')}")
