@@ -6,6 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 class Browser:
+    """
+    Class for the browser.\n
+    """
     def __init__(self):
         chrome_options = Options()
         #chrome_options.add_argument("--headless=new")
