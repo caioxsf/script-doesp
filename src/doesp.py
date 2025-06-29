@@ -90,9 +90,11 @@ def scraping_doesp():
     """
     browser = Browser()
 
+    data = os.getenv("DATA").split(",")
+    print(data)
     list_content = []
     date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
-    browser.open(f"https://doe.sp.gov.br/sumario?editionDate={date_today}")
+    browser.open(f"https://doe.sp.gov.br/sumario?editionDate=2025-06-10")
 
     time.sleep(3)
     WebDriverWait(browser.driver, 10).until(
@@ -155,7 +157,8 @@ def scraping_doesp():
                             )
                         ).text
 
-                        list_content.append((f"{sec} - {secretaria} - {header}", content))
+                        if any(dado in content for dado in data):
+                            list_content.append((f"{sec} - {secretaria} - {header}", content))
 
                     for handle in abas[1:]:
                         browser.driver.switch_to.window(handle)
@@ -174,14 +177,14 @@ def scraping_doesp():
         pdf_path = f"/app/output/leitura-diario-{date_today}.pdf"
         send_email(
             os.getenv("DESTINATARIO"), 
-            "PDF do Diário Oficial", 
+            "PDF Leitura do Diário Oficial", 
             body="Segue em anexo o PDF gerado.", 
             dir_pdf=pdf_path)
     else:
         send_email(
             os.getenv("DESTINATARIO"), 
-            "PDF do Diário Oficial", 
-            body=f"Não existem matérias da Diretoria de Ensino - Região de Assis para o dia {date_today.strftime('%d/%m/%Y')}",
+            "PDF Leitura do Diário Oficial", 
+            body=f"Não existem matérias da Diretoria de Ensino da Região de Assis para a EE ANTÔNIO DE ALMEIDA PRADO no dia {date_today.strftime('%d/%m/%Y')}",
             dir_pdf=""
         )
-        print(f"Não existem matérias da Diretoria de Ensino - Região de Assis para o dia {date_today.strftime('%d/%m/%Y')}")
+        print(f"Não existem matérias da Diretoria de Ensino da Região de Assis para a EE ANTÔNIO DE ALMEIDA PRADO no dia {date_today.strftime('%d/%m/%Y')}")
