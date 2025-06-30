@@ -36,7 +36,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir  -r requirements.txt
 COPY fonts /app/fonts
 
-RUN echo "* * * * * cd /app && /usr/local/bin/python main.py >> /var/log/cron.log 2>&1" > /etc/cron.d/my-cron \
+RUN echo "* * * * * root cd /app && /usr/local/bin/python main.py >> /var/log/cron.log 2>&1" > /etc/cron.d/my-cron \
+    && echo "" >> /etc/cron.d/my-cron \
     && chmod 0644 /etc/cron.d/my-cron \
     && crontab /etc/cron.d/my-cron \
     && touch /var/log/cron.log
