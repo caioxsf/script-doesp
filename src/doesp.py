@@ -94,7 +94,8 @@ def scraping_doesp():
     print(data)
     list_content = []
     date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
-    browser.open(f"https://doe.sp.gov.br/sumario?editionDate=2025-06-10")
+    
+    browser.open(f"https://doe.sp.gov.br/sumario?editionDate={date_today}")
 
     time.sleep(3)
     WebDriverWait(browser.driver, 10).until(
