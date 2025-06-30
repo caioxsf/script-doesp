@@ -10,6 +10,6 @@ services:
       - ./.env
     environment:
       - PYTHONUNBUFFERED=1
-      #- DISPLAY=192.168.0.116
       - DISPLAY=host.docker.internal:0
-    command: python main.py
+    #command: python main.py
+    command: cron -f

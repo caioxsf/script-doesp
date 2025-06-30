@@ -91,7 +91,6 @@ def scraping_doesp():
     browser = Browser()
 
     data = os.getenv("DATA").split(",")
-    print(data)
     list_content = []
     date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
     

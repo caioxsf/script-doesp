@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     gnupg \
+    cron \
     fonts-liberation \
     libu2f-udev \
     libnss3 \
@@ -35,6 +36,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir  -r requirements.txt
 COPY fonts /app/fonts
 
+RUN echo "0 7 * * * cd /app && /usr/local/bin/python main.py >> /var/log/cron.log 2>&1" > /etc/cron.d/my-cron \
+    && chmod 0644 /etc/cron.d/my-cron \
+    && crontab /etc/cron.d/my-cron \
+    && touch /var/log/cron.log
+
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "main.py"]
+CMD ["cron", "-f"]
