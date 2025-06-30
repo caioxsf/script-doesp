@@ -3,3 +3,4 @@ webdriver-manager==4.0.2
 reportlab>=3.6.13
 yagmail==0.15.293
 python-dotenv
+schedule==1.2.0
