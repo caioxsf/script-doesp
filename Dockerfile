@@ -37,5 +37,6 @@ RUN pip install --no-cache-dir  -r requirements.txt
 COPY fonts /app/fonts
 
 ENV PYTHONUNBUFFERED=1
+ENV TZ=America/Sao_Paulo
 
 CMD ["python", "scheduler.py"]

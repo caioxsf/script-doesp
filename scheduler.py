@@ -1,13 +1,16 @@
 import schedule
 import time
 import subprocess
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def task():
-    print("Lendo o diário oficial as 07:00..")
+    date_today = datetime.now(ZoneInfo("America/Sao_Paulo")).date()
+    print(f"Lendo o diário oficial dia {date_today} as 07:00..")
     subprocess.run(["python", "main.py"])
     
-schedule.every(5).minutes.do(task)
+schedule.every().day.at("07:00").do(task)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)
+    time.sleep(60)
