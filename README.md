@@ -51,7 +51,7 @@ The following environment variables need to be configured in a `.env` file:
 2. Build the container:
    ```bash
    docker compose build
-3. Run the containr?
+3. Run the container:
     ```bash
    docker compose run
 ---
