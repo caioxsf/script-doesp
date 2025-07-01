@@ -11,4 +11,4 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DISPLAY=host.docker.internal:0
-    command: python schedule.py
+    command: python scheduler.py

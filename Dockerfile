@@ -38,4 +38,4 @@ COPY fonts /app/fonts
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "schedule.py"]
+CMD ["python", "scheduler.py"]
