@@ -46,7 +46,7 @@ The following environment variables need to be configured in a `.env` file:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/doe-sp-scraper.git
+   git clone https://github.com/caioxsf/doe-sp-scraper.git
    cd doe-sp-scraper
 2. Build the container:
    ```bash
