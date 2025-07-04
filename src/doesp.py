@@ -171,6 +171,7 @@ def scraping_doesp():
             
     if list_content:
         output_dir = "/app/output/"
+        os.makedirs(output_dir, exist_ok=True)
         name_file = os.path.join(output_dir, f"leitura-diario-{date_today}.pdf")
         remove_files(output_dir)
         generate_pdf_reportlab(list_content, name_file)
