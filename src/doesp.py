@@ -80,8 +80,9 @@ def send_email(recipient, subject, body, dir_pdf):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(os.getenv("EMAIL"), os.getenv("PASSWORD"))
         smtp.send_message(msg)
-
-    print("E-mail enviado com sucesso.")
+        
+    hour = datetime.now(ZoneInfo("America/Sao_Paulo"))
+    print(f"E-mail enviado com sucesso às {hour.strftime('%H:%M')}.")
     
     
 def scraping_doesp():
