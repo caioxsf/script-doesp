@@ -46,8 +46,8 @@ The following environment variables need to be configured in a `.env` file:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/caioxsf/doe-sp-scraper.git
-   cd doe-sp-scraper
+   git clone https://github.com/caioxsf/script-doesp.git
+   cd script-doesp
 2. Build the container:
    ```bash
    docker compose build
